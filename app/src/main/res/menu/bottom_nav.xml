@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/myMusic"
+        android:icon="@drawable/outline_headphones_24"
+        android:title="@string/myMusic"
+        />
+    <item
+        android:id="@+id/watch"
+        android:icon="@drawable/outline_smart_display_24"
+        android:title="@string/watch"
+
+        />
+
+</menu>

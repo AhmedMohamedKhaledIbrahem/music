@@ -1,0 +1,83 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/custom"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:id="@+id/songTitleNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginHorizontal="10dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Song Title"
+        android:textColor="@android:color/black"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/artistNameNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginHorizontal="10dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Artist Name"
+        android:textColor="@android:color/black"
+        android:textSize="11sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <ImageButton
+            android:id="@+id/repeatMusicNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_marginHorizontal="10dp"
+            android:src="@drawable/baseline_replay_24" />
+
+        <ImageButton
+            android:id="@+id/buttonPreviousMusicNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+
+            android:src="@drawable/baseline_skip_previous_24"
+            android:layout_marginHorizontal="10dp"
+            />
+
+        <ImageButton
+            android:id="@+id/buttonPlayPauseMusicNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_marginHorizontal="10dp"
+            android:src="@drawable/baseline_pause_24" />
+        <ImageButton
+            android:id="@+id/buttonNextMusicNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_marginHorizontal="10dp"
+            android:src="@drawable/baseline_skip_next_24" />
+        <ImageButton
+            android:id="@+id/buttonFavouritesMusicNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_marginHorizontal="10dp"
+            android:src="@drawable/baseline_favorite_24" />
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

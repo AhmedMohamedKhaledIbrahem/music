@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navView">
+
+    <item
+        android:id="@+id/downloads"
+        android:icon="@drawable/outline_south_24"
+        android:title="@string/downloads"
+    />
+
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/baseline_settings_24"
+        android:title="@string/settings"
+    />
+
+    <item
+        android:id="@+id/languages"
+        android:icon="@drawable/baseline_language_24"
+        android:title="@string/languages"
+    />
+
+
+</menu>
