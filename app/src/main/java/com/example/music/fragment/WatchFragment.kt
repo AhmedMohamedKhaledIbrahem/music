@@ -93,7 +93,7 @@ class WatchFragment : Fragment() {
             .searchVideos(
                 part = "snippet",
                 query = search,
-                apiKey = "AIzaSyAq0H-zJuHfvCOPThsYj2JsOH66SYuoN74",
+                apiKey = "your api key from youtube data V3",
                 type = "video",
                 maxResult = 30
             )
