@@ -29,7 +29,6 @@ class MusicTabFragment : Fragment() {
             tab.text = when (position) {
                 0 -> "Songs"
                 1 -> "Artists"
-                2 -> "Albums"
                 else -> null
             }
         }.attach()

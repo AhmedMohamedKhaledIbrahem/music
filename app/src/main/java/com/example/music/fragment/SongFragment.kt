@@ -4,11 +4,9 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -19,18 +17,20 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.music.ExoPlayerActivity
-import com.example.music.MusicModelView
-import com.example.music.MusicUtilities
+import com.example.music.activity.ExoPlayerActivity
+import com.example.music.data.model.MusicModel
+import com.example.music.utils.MusicUtilities
 import com.example.music.R
-import com.example.music.adapter.MusicAdapterRecycleView
-import com.example.music.adapter.getMusicFile
+import com.example.music.adapter.MusicAdapter
+import com.example.music.data.viewmodel.NavigationBottomBarViewModel
+import com.example.music.getMusicFile
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.Gson
-import java.io.File
 
 
 class SongFragment : Fragment() {
     private lateinit var mRecyclerView: RecyclerView
+    lateinit var bottomNav :BottomNavigationView
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -68,12 +68,33 @@ class SongFragment : Fragment() {
         } else {
             requestReadStoragePermission()
         }
-
-
+        bottomNav = requireActivity().findViewById(R.id.bottomNav)
+        scrollListener(bottomNav)
 
 
 
         return view
+    }
+
+
+    private fun scrollListener(
+        bottomNav: BottomNavigationView, ) {
+        mRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0){
+
+                    bottomNav.visibility = View.GONE
+                    // Log.e("onScrolled", "onScrolled:down ", )
+                }else if (dy < 0){
+                    // Log.e("onScrolled", "onScrolled:up ", )
+
+                    bottomNav.visibility = View.VISIBLE
+                }
+
+            }
+        }
+        )
     }
 
     private fun isReadStoragePermissionGranted(): Boolean {
@@ -92,7 +113,7 @@ class SongFragment : Fragment() {
         val musicList = getMusicFile(requireContext())
         saveMusicList(musicList)
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        val customAdapter = MusicAdapterRecycleView(context, musicList) { musicData, position ->
+        val customAdapter = MusicAdapter(context, musicList) { musicData, position ->
             Log.e("postion", position.toString())
             MusicUtilities.uri = musicData.uri
             MusicUtilities.gradientDrawable = musicData.gradientDrawable
@@ -109,7 +130,7 @@ class SongFragment : Fragment() {
 
 
 
-    private fun saveMusicList(musicList: List<MusicModelView>) {
+    private fun saveMusicList(musicList: List<MusicModel>) {
         val shardPreferences =
             requireContext().getSharedPreferences("MusicPreferences", Context.MODE_PRIVATE)
         val editor = shardPreferences.edit()

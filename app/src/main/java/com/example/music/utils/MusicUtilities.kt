@@ -1,4 +1,4 @@
-package com.example.music
+package com.example.music.utils
 
 import android.graphics.drawable.GradientDrawable
 import androidx.activity.ComponentActivity

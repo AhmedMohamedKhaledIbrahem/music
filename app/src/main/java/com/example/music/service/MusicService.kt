@@ -1,40 +1,57 @@
 package com.example.music.service
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import android.widget.RemoteViews
-import androidx.appcompat.app.AppCompatActivity
+import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.ExoPlayer
-import com.example.music.App
-import com.example.music.ExoPlayerActivity
-import com.example.music.ExoPlayerUtilities
-import com.example.music.MainActivity
-import com.example.music.Music
-import com.example.music.MusicUtilities
+import androidx.media3.exoplayer.source.ConcatenatingMediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.example.music.R
-import com.example.music.data.NavigationViewModel
-import com.example.music.data.NotificationItemsViewModel
-import kotlin.math.E
+import com.example.music.data.model.MusicModel
+import com.example.music.utils.ExoPlayerUtilities
+import com.example.music.utils.MusicUtilities
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class MusicService : Service() {
-private lateinit var exoPlayer :ExoPlayer
+    private lateinit var exoPlayer: ExoPlayer
+    private lateinit var musicList: List<MusicModel>
 
 
     override fun onCreate() {
         super.onCreate()
-        exoPlayer =ExoPlayerUtilities.exoPlayer
+        exoPlayer = ExoPlayerUtilities.exoPlayer
+        musicList = getMusicList()
+
+
+        exoPlayer.addListener(object : Player.Listener {
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                super.onMediaItemTransition(mediaItem, reason)
+                start()
+            }
+
+            override fun onPlaybackStateChanged(state: Int) {
+                super.onPlaybackStateChanged(state)
+                start()
+            }
+
+        })
+
+
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
+    @OptIn(UnstableApi::class)
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
 
         when (intent?.action) {
@@ -50,42 +67,41 @@ private lateinit var exoPlayer :ExoPlayer
             }
 
             "ACTION_START" -> {
-                val currentPosition = exoPlayer.currentPosition
-                MusicUtilities.currentBuffer = currentPosition
-                val mediaItem: MediaItem? = MusicUtilities.uri?.let { MediaItem.fromUri(it) }
-                if (mediaItem != null) {
-                    exoPlayer.setMediaItem(mediaItem)
-                }
-
+                val currentIndex = intent.getIntExtra("currentIndex", 0)
+                val currentPosition = intent.getLongExtra("currentPosition", 0)
+                val concatenatingMediaSource = createMediaSources(musicList)
+                exoPlayer.setMediaSource(concatenatingMediaSource)
                 exoPlayer.prepare()
-                exoPlayer.seekTo(currentPosition)
+                exoPlayer.seekTo(currentIndex, currentPosition)
                 exoPlayer.playWhenReady = true
 
             }
-            "ACTION_NEXT"->{
+
+            "ACTION_NEXT" -> {
 
 
-                if (exoPlayer.hasNextMediaItem()){
+                if (exoPlayer.hasNextMediaItem()) {
                     exoPlayer.seekToNext()
+                } else {
+                    exoPlayer.seekTo(0)
                 }
             }
-            "ACTION_PREV"->{
-                if (exoPlayer.hasPreviousMediaItem()){
+
+            "ACTION_PREV" -> {
+                if (exoPlayer.hasPreviousMediaItem()) {
                     exoPlayer.seekToPreviousMediaItem()
+                } else {
+                    exoPlayer.seekTo(0)
                 }
 
             }
 
             else -> {
-               // val currentPosition = intent?.getLongExtra("CURRENT_POSITION", 0L)
                 val mediaItem: MediaItem? = MusicUtilities.uri?.let { MediaItem.fromUri(it) }
                 if (mediaItem != null) {
                     exoPlayer.setMediaItem(mediaItem)
                 }
                 exoPlayer.prepare()
-                //if (currentPosition != null) {
-                //    exoPlayer.seekTo(currentPosition)
-              //  }
                 exoPlayer.playWhenReady = true
             }
         }
@@ -97,38 +113,30 @@ private lateinit var exoPlayer :ExoPlayer
 
     private fun start() {
 
-      //  val currentPosition = exoPlayer.currentPosition
-       /* val notificationIntent = Intent(this, ExoPlayerActivity::class.java)
-        //.apply //{
-          //  putExtra("CURRENT_POSITION", currentPosition)
-        //}
-        val pendingIntent = if (App.isAppInForeground){
-            PendingIntent.getActivity(
-                this, 0, Intent(), PendingIntent.FLAG_IMMUTABLE
-            )
-        }else{
-            PendingIntent.getActivity(
-                this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
-            )
-        }*/
-        val notificationIntent = Intent(this, ExoPlayerActivity::class.java).apply {
-            putExtra("currentPosition",MusicUtilities.currentBuffer)
-        }
-        val pendingIntent =PendingIntent.getActivity(
-            this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val remoteView = RemoteViews(packageName, R.layout.notification_custom).apply {
-
-            setTextViewText(R.id.songTitleNotification, MusicUtilities.songTitle)
-            setTextViewText(R.id.artistNameNotification, MusicUtilities.songArtist)
-
-            var  nViewModel = MusicUtilities.appComponent?.let { ViewModelProvider(it) }?.get(NotificationItemsViewModel::class.java)
+            val currentIndex = exoPlayer.currentMediaItemIndex
+            setTextViewText(R.id.songTitleNotification, musicList[currentIndex].musicTitle)
+            setTextViewText(R.id.artistNameNotification, musicList[currentIndex].authorMusic)
+            /*var  nViewModel = MusicUtilities.appComponent?.let { ViewModelProvider(it) }?.get(
+                NotificationItemsViewModel::class.java)
             val playPauseIcon =
                 if (exoPlayer.isPlaying) R.drawable.baseline_play_arrow_24  else R.drawable.baseline_pause_24
             nViewModel?.changeNotificationItemStates(playPauseIcon)
             nViewModel?.updateItem?.observeForever { item ->
                 setImageViewResource(R.id.buttonPlayPauseMusicNotification, item)
+            }*/
+            val playPauseIcon = if (exoPlayer.isPlaying) {
+
+                R.drawable.baseline_pause_24
+
+            } else {
+                R.drawable.baseline_play_arrow_24
+
+
             }
+
+            setImageViewResource(R.id.buttonPlayPauseMusicNotification, playPauseIcon)
 
             setOnClickPendingIntent(
                 R.id.buttonPlayPauseMusicNotification,
@@ -145,12 +153,9 @@ private lateinit var exoPlayer :ExoPlayer
 
 
         }
-
-
         val notification = NotificationCompat.Builder(this, "music_channel")
             .setSmallIcon(R.drawable.baseline_library_music_24)
             .setCustomContentView(remoteView)
-            .setContentIntent(pendingIntent)
             .setOngoing(true)
             .build()
         startForeground(1, notification)
@@ -160,12 +165,12 @@ private lateinit var exoPlayer :ExoPlayer
         val intent = Intent(this, MusicService::class.java).apply {
             this.action = action
         }
-        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     override fun onDestroy() {
-      //  ExoPlayerUtilities.exoPlayer.release()
         super.onDestroy()
+
     }
 
 
@@ -177,6 +182,32 @@ private lateinit var exoPlayer :ExoPlayer
         val minutes = (position / 1000) / 60
         val seconds = (position / 1000) % 60
         return String.format("%02d:%02d", minutes, seconds)
+    }
+
+    @OptIn(UnstableApi::class)
+    fun createMediaSources(musicList: List<MusicModel>): ConcatenatingMediaSource {
+        val dataSourceFactory = DefaultDataSource.Factory(applicationContext)
+        val concatenatingMediaSource = ConcatenatingMediaSource()
+        musicList.forEachIndexed { index, music ->
+            val mediaItem = MediaItem.fromUri(music.uri)
+            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(mediaItem)
+            concatenatingMediaSource.addMediaSource(mediaSource)
+        }
+        return concatenatingMediaSource
+    }
+
+    private fun getMusicList(): List<MusicModel> {
+        val sharedPreferences =
+            applicationContext.getSharedPreferences("MusicPreferences", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val json = sharedPreferences.getString("musicList", null)
+        val type = object : TypeToken<List<MusicModel>>() {}.type
+        return if (json != null) {
+            gson.fromJson(json, type)
+        } else {
+            emptyList()
+        }
     }
 
 

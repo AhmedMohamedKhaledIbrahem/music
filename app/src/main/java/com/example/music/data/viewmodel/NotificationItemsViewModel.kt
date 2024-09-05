@@ -1,4 +1,4 @@
-package com.example.music.data
+package com.example.music.data.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

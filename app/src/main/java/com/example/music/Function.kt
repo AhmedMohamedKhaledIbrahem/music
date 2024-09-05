@@ -1,15 +1,15 @@
-package com.example.music.adapter
+package com.example.music
 
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
 import android.util.Log
-import com.example.music.MusicModelView
-import com.example.music.data.ArtistModel
+import com.example.music.data.model.MusicModel
+import com.example.music.data.model.ArtistModel
 import java.io.File
 
-fun getMusicFile(context: Context): List<MusicModelView> {
-    val musicList = mutableListOf<MusicModelView>()
+fun getMusicFile(context: Context): List<MusicModel> {
+    val musicList = mutableListOf<MusicModel>()
     val contentResolver = context.contentResolver
     val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     val projection = arrayOf(
@@ -38,7 +38,7 @@ fun getMusicFile(context: Context): List<MusicModelView> {
                         uriData.startsWith("/storage/emulated/0/Music/")
                     ) {
                         musicList.add(
-                            MusicModelView(
+                            MusicModel(
                                 uri = uriData,
                                 musicTitle = title,
                                 authorMusic = author,
@@ -61,7 +61,7 @@ fun getMusicFile(context: Context): List<MusicModelView> {
     return musicList
 }
 fun getArtistFile(context: Context): List<ArtistModel> {
-    val musicMap = mutableMapOf<String, MutableList<MusicModelView>>()
+    val musicMap = mutableMapOf<String, MutableList<MusicModel>>()
     val contentResolver = context.contentResolver
     val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     val projection = arrayOf(
@@ -92,7 +92,7 @@ fun getArtistFile(context: Context): List<ArtistModel> {
                         uriData.endsWith(".mp3", ignoreCase = true) &&
                         uriData.startsWith("/storage/emulated/0/Music/")
                     ) {
-                        val song = MusicModelView(title, uriData)
+                        val song = MusicModel(title, uriData)
                         if (author in musicMap) {
                             musicMap[author]?.add(song)
                         } else {

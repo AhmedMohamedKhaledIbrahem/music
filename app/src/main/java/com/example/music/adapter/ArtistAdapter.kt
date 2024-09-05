@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.music.ArtistViewHolder
+import com.example.music.adapter.viewholder.ArtistViewHolder
 import com.example.music.R
-import com.example.music.data.ArtistModel
+import com.example.music.data.model.ArtistModel
 
-class ArtistAdapterRecycleView(
+class ArtistAdapter(
     private val aRecycleListView:  List<ArtistModel>,
     private val onClickListener: (ArtistModel) -> Unit
 ):RecyclerView.Adapter<ArtistViewHolder>() {

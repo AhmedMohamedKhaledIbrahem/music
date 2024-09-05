@@ -8,12 +8,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.music.R
-import com.example.music.adapter.ArtistAdapterRecycleView
-import com.example.music.adapter.getArtistFile
+import com.example.music.adapter.ArtistAdapter
+import com.example.music.getArtistFile
 
 class ArtistFragment : Fragment() {
     private lateinit var artistRecyclerView: RecyclerView
-    private lateinit var artistAdapter: ArtistAdapterRecycleView
+    private lateinit var artistAdapter: ArtistAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,7 +29,7 @@ class ArtistFragment : Fragment() {
     private fun recycleCrate(){
         val artist = getArtistFile(requireContext())
         artistRecyclerView.layoutManager = LinearLayoutManager(context,RecyclerView.VERTICAL,false)
-        artistAdapter = ArtistAdapterRecycleView(artist){}
+        artistAdapter = ArtistAdapter(artist){}
         artistRecyclerView.adapter = artistAdapter
     }
 

@@ -47,14 +47,16 @@ dependencies {
     implementation ("androidx.media3:media3-exoplayer-dash:1.3.1")
     implementation ("androidx.media3:media3-ui:1.3.1")
     // RxJava
-    implementation ("io.reactivex.rxjava2:rxjava:2.2.19")
-    implementation ("io.reactivex.rxjava2:rxandroid:2.1.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation ("com.squareup.retrofit2:adapter-rxjava3:2.11.0")
+    implementation("io.reactivex.rxjava3:rxjava:3.1.8")
+    implementation ("io.reactivex.rxjava3:rxandroid:3.0.2")
     implementation("io.coil-kt:coil-compose:2.6.0")
 
     // Retrofit adapter for RxJava
-    implementation("com.squareup.retrofit2:adapter-rxjava2:2.9.0")
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.5.0")
+
 
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.3.1")
     implementation("androidx.compose.runtime:runtime-livedata:1.6.7")
@@ -62,6 +64,7 @@ dependencies {
     implementation ("com.google.code.gson:gson:2.10.1")
     implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation ("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation ("com.github.bumptech.glide:glide:4.11.0")
 
 
     testImplementation(libs.junit)

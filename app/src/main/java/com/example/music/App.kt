@@ -4,12 +4,14 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.example.music.service.MusicService
 
 class App:Application() ,LifecycleEventObserver {
     companion object{
@@ -35,6 +37,8 @@ class App:Application() ,LifecycleEventObserver {
 
 
     }
+
+
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when(event){

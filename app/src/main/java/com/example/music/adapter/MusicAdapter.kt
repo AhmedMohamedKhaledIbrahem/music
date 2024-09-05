@@ -12,14 +12,14 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
-import com.example.music.MusicModelView
-import com.example.music.MusicViewHolder
+import com.example.music.data.model.MusicModel
+import com.example.music.adapter.viewholder.MusicViewHolder
 import com.example.music.R
 
-class MusicAdapterRecycleView(
+class MusicAdapter(
     private var context: Context?,
-    private var mRecycleListView:List<MusicModelView>,
-    private val onMusicClick:(MusicModelView , Int) -> Unit
+    private var mRecycleListView:List<MusicModel>,
+    private val onMusicClick:(MusicModel, Int) -> Unit
 )
     :RecyclerView.Adapter<MusicViewHolder>() {
 
@@ -51,7 +51,7 @@ class MusicAdapterRecycleView(
         }
     }
 
-    private fun shareMusic(musicInformationView: MusicModelView) {
+    private fun shareMusic(musicInformationView: MusicModel) {
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "audio/mp3"
             putExtra(Intent.EXTRA_STREAM, musicInformationView.uri.toUri())

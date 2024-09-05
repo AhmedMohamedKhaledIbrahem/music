@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_constraintStart_toStartOf="parent"
-    tools:context=".Music">
+    tools:context=".activity.MusicActivity">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -50,7 +50,6 @@
             >
 
             <!-- Include the card_item layout multiple times -->
-            <include layout="@layout/card_items" />
             <include layout="@layout/card_items" />
             <include layout="@layout/card_items" />
         </LinearLayout>

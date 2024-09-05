@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.music.R
 import com.example.music.adapter.FolderAdapter
-import com.example.music.data.FolderModelView
+import com.example.music.data.model.FolderModel
 
 class FolderFragment : Fragment() {
     private lateinit var folderRecyclerView: RecyclerView
@@ -39,10 +39,10 @@ class FolderFragment : Fragment() {
 
     }
 
-    private fun getFoldersFromStorage(): List<FolderModelView> {
+    private fun getFoldersFromStorage(): List<FolderModel> {
 
         return listOf(
-            FolderModelView(name = "Music", details = " || /storage/emulated/0/Music/" , path = "/storage/emulated/0/Music/" )
+            FolderModel(name = "Music", details = " || /storage/emulated/0/Music/" , path = "/storage/emulated/0/Music/" )
         )
     }
 

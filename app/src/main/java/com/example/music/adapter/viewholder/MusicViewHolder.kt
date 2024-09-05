@@ -1,4 +1,4 @@
-package com.example.music
+package com.example.music.adapter.viewholder
 
 import android.view.View
 import android.widget.ImageButton
@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.music.R
 
 class MusicViewHolder(itemView:View) :RecyclerView.ViewHolder(itemView) {
 

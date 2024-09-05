@@ -1,11 +1,13 @@
-package com.example.music
+package com.example.music.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -18,19 +20,24 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.music.data.NavigationViewModel
+import com.example.music.utils.MusicUtilities
+import com.example.music.R
+import com.example.music.data.viewmodel.NavigationBottomBarViewModel
+import com.example.music.data.viewmodel.NavigationViewModel
 import com.example.music.fragment.MusicTabFragment
 import com.example.music.fragment.SongFragment
 import com.example.music.fragment.WatchFragment
+import com.example.music.service.MusicService
+import com.example.music.utils.ExoPlayerUtilities
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 
-class Music : AppCompatActivity() {
+class MusicActivity : AppCompatActivity() {
     private val songFragment = SongFragment()
     private val musicTaps = MusicTabFragment()
     private val watchFragment = WatchFragment()
     private lateinit var toggle: ActionBarDrawerToggle
-    private lateinit var  nViewModel  :NavigationViewModel
+    private lateinit var  nViewModel  : NavigationViewModel
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +48,7 @@ class Music : AppCompatActivity() {
         val navigationView: NavigationView = findViewById(R.id.navView)
         val toolbar: Toolbar = findViewById(R.id.topAppBar)
         nViewModel = ViewModelProvider(this)[NavigationViewModel::class.java]
+        val vBottomBar = ViewModelProvider(this)[NavigationBottomBarViewModel::class.java]
         MusicUtilities.appComponent = this
         if (Build.VERSION.SDK_INT >=Build.VERSION_CODES.O){
             ActivityCompat.requestPermissions(
@@ -55,13 +63,16 @@ class Music : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
         addFragment(musicTaps)
-        navControl()
+        navControl(vBottomBar)
         navigationDrawerLayout(navDrawerLayout, toolbar)
         navigationDrawerView(navigationView)
         cardItemsStateObserveViewModel(cardContainer)
 
 
     }
+
+
+
 
     private fun cardItemsStateObserveViewModel(cardContainer: LinearLayout){
         nViewModel.showState.observe(this, Observer { show->
@@ -87,14 +98,14 @@ class Music : AppCompatActivity() {
                 Toast.makeText(applicationContext, "lol", Toast.LENGTH_SHORT).show()
             }
 
-            val card2 = cardContainer.getChildAt(1)
+            /*val card2 = cardContainer.getChildAt(1)
              card2.visibility = LinearLayout.VISIBLE
             card2.findViewById<ImageView>(R.id.card_icon)
                 .setImageResource(R.drawable.baseline_library_music_24)
             card2.findViewById<TextView>(R.id.card_label).text = getString(R.string.playLists)
-            card2.background = getDrawable(R.drawable.playlists_card_color)
+            card2.background = getDrawable(R.drawable.playlists_card_color)*/
 
-            val card3 = cardContainer.getChildAt(2)
+            val card3 = cardContainer.getChildAt(1)
             card3.visibility = LinearLayout.VISIBLE
             card3.findViewById<ImageView>(R.id.card_icon)
                 .setImageResource(R.drawable.baseline_access_time_filled_24)
@@ -126,9 +137,11 @@ class Music : AppCompatActivity() {
         Toast.makeText(applicationContext, test, Toast.LENGTH_SHORT).show()
     }
 
-    private fun navControl() {
+    private fun navControl(vBottomBar: NavigationBottomBarViewModel) {
 
         var buttonNav: BottomNavigationView = findViewById(R.id.bottomNav)
+
+
         buttonNav.setOnItemSelectedListener { item ->
 
             when (item.itemId) {
@@ -193,6 +206,15 @@ class Music : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.e("TAG", "onDestroy: ", )
+        val intentMusicService = Intent(this, MusicService::class.java)
+        stopService(intentMusicService)
+        ExoPlayerUtilities.exoPlayer.release()
+
     }
 
 

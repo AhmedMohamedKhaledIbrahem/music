@@ -1,4 +1,4 @@
-package com.example.music
+package com.example.music.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.music.R
 
 class MainActivity : AppCompatActivity() {
     @SuppressLint("SuspiciousIndentation")
@@ -22,7 +23,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         Handler(Looper.getMainLooper()).postDelayed({
-         val intent = Intent(this , Music::class.java)
+         val intent = Intent(this , MusicActivity::class.java)
             startActivity(intent)
         },3000)
     }

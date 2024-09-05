@@ -3,13 +3,13 @@ package com.example.music.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.music.FolderViewHolder
 import com.example.music.R
-import com.example.music.data.FolderModelView
+import com.example.music.adapter.viewholder.FolderViewHolder
+import com.example.music.data.model.FolderModel
 
 class FolderAdapter(
-    private val folders: List<FolderModelView>,
-    private val clickListener: (FolderModelView) -> Unit
+    private val folders: List<FolderModel>,
+    private val clickListener: (FolderModel) -> Unit
     ) : RecyclerView.Adapter<FolderViewHolder>() {
 
 

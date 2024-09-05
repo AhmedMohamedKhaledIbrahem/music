@@ -1,4 +1,4 @@
-package com.example.music
+package com.example.music.activity
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -24,7 +24,11 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ConcatenatingMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerView
+import com.example.music.R
+import com.example.music.data.model.MusicModel
 import com.example.music.service.MusicService
+import com.example.music.utils.ExoPlayerUtilities
+import com.example.music.utils.MusicUtilities
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -40,7 +44,7 @@ class ExoPlayerActivity : AppCompatActivity() {
     private lateinit var exoPlayerConstraintLayout: ConstraintLayout
     private lateinit var songTitleTextView: TextView
     private lateinit var songArtistTextView: TextView
-    private lateinit var musicList: List<MusicModelView>
+    private lateinit var musicList: List<MusicModel>
 
 
     companion object {
@@ -84,12 +88,12 @@ class ExoPlayerActivity : AppCompatActivity() {
 
     }
 
-    private fun getMusicList(): List<MusicModelView> {
+    private fun getMusicList(): List<MusicModel> {
         val sharedPreferences =
             applicationContext.getSharedPreferences("MusicPreferences", Context.MODE_PRIVATE)
         val gson = Gson()
         val json = sharedPreferences.getString("musicList", null)
-        val type = object : TypeToken<List<MusicModelView>>() {}.type
+        val type = object : TypeToken<List<MusicModel>>() {}.type
         return if (json != null) {
             gson.fromJson(json, type)
         } else {
@@ -99,53 +103,36 @@ class ExoPlayerActivity : AppCompatActivity() {
 
 
     @OptIn(UnstableApi::class)
-    private fun initializePlayer(uri: String?,) {
+    private fun initializePlayer(uri: String?) {
         val currentIndex = intent.getIntExtra("currentIndex", 0)
-        ///exoPlayer = ExoPlayer.Builder(this).build()
         playerView.player = exoPlayer
-
-        /*val mediaItem = uri?.let { MediaItem.fromUri(it) }
-        if (mediaItem != null) {
-            exoPlayer.setMediaItem(mediaItem)
-        }*/
-
-
-       val concatenatingMediaSource = createMediaSources(musicList)
-       exoPlayer.setMediaSource(concatenatingMediaSource)
-
-       /* if (currentIndex in musicList.indices){
-            val music = musicList[currentIndex]
-            val mediaItem = MediaItem.fromUri(music.uri)
-            exoPlayer.setMediaItem(mediaItem)
-        }*/
-
-
+        val concatenatingMediaSource = createMediaSources(musicList)
+        exoPlayer.setMediaSource(concatenatingMediaSource)
         exoPlayer.prepare()
-        exoPlayer.seekTo(currentIndex,0)
-        MusicUtilities.currentBuffer?.let {
+        exoPlayer.seekTo(currentIndex, 0)
+        /*MusicUtilities.currentBuffer?.let {
             exoPlayer.pause()
-            exoPlayer.seekTo(currentIndex,it)
+            exoPlayer.seekTo(currentIndex, it)
             exoPlayer.play()
-        }
+        }*/
         exoPlayer.playWhenReady = true
         updateSongInfo()
-        // Log.e("exoPlayer.currentPosition","${exoPlayer.currentPosition.toInt()}")
         val intent = Intent(applicationContext, MusicService::class.java)
         stopService(intent)
     }
 
     @OptIn(UnstableApi::class)
-    private fun createMediaSources(musicList: List<MusicModelView>): ConcatenatingMediaSource {
+    private fun createMediaSources(musicList: List<MusicModel>): ConcatenatingMediaSource {
         val dataSourceFactory = DefaultDataSource.Factory(applicationContext)
         val concatenatingMediaSource = ConcatenatingMediaSource()
         val currentIndex = intent.getIntExtra("currentIndex", 0)
         musicList.forEachIndexed { index, music ->
 
-                    Log.e("postion2", index.toString())
-                    val mediaItem = MediaItem.fromUri(music.uri)
-                    val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(mediaItem)
-                    concatenatingMediaSource.addMediaSource(mediaSource)
+            Log.e("postion2", index.toString())
+            val mediaItem = MediaItem.fromUri(music.uri)
+            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(mediaItem)
+            concatenatingMediaSource.addMediaSource(mediaSource)
 
 
         }
@@ -167,12 +154,16 @@ class ExoPlayerActivity : AppCompatActivity() {
 
             if (exoPlayer.hasNextMediaItem()) {
                 exoPlayer.seekToNextMediaItem()
+            }else{
+                exoPlayer.seekTo(0)
             }
         }
 
         previousButton.setOnClickListener {
             if (exoPlayer.hasPreviousMediaItem()) {
                 exoPlayer.seekToPreviousMediaItem()
+            }else{
+                exoPlayer.seekTo(0)
             }
         }
 
@@ -239,20 +230,29 @@ class ExoPlayerActivity : AppCompatActivity() {
     private fun backPressed() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                //val currentPosition = exoPlayer.currentPosition
-                //MusicUtilities.currentBuffer = currentPosition
+                val currentPosition = exoPlayer.currentPosition
+                val currentIndex  = exoPlayer.currentMediaItemIndex
+                val currentUri = musicList[currentIndex].uri
+                MusicUtilities.currentBuffer = currentPosition
+
                 finish()
                 val intent = Intent(applicationContext, MusicService::class.java).apply {
                     action = "ACTION_START"
+                    putExtra("currentUri", currentUri)
+                    putExtra("currentIndex", currentIndex)
+                    putExtra("currentPosition", currentPosition)
                 }
                 startForegroundService(intent)
+
 
             }
 
 
         })
     }
-    private fun updateSongInfo(){
+
+    private fun updateSongInfo() {
+
         exoPlayer.addListener(object : Player.Listener {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 val currentIndex = exoPlayer.currentMediaItemIndex
@@ -268,14 +268,13 @@ class ExoPlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        //releasePlayer()
+
     }
 
     private fun releasePlayer() {
         ExoPlayerUtilities.exoPlayer.release()
 
     }
-
 
 
 }
